@@ -1046,6 +1046,12 @@ void App::OnPreSystemLinkInit()
 void App::OnPostSetup()
 {
     rex::ReXApp::OnPostSetup();
+    // Vulkan host render targets: without a CPU-estimated extent, the unclipped
+    // depth-only clear quads claim EDRAM up to the 2048-tile wrap, take
+    // ownership of the color tiles, and the front buffer resolves black. The
+    // cvar belongs to the GPU plugin, so it exists only after setup.
+    if (!rex::cvar::SetFlagAsApplicationDefault("execute_unclipped_draw_vs_on_cpu", "true"))
+        REXLOG_WARN("execute_unclipped_draw_vs_on_cpu default not applied");
 
     // Resolve selected package assets after the SDK has built the loadout and
     // before the guest main thread is resumed.
